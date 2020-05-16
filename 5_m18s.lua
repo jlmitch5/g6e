@@ -24,11 +24,14 @@ nextStage1 = 1
 pingPongDir1 = 'forward'
 fixedLengthStageCount1 = 1
 function advance1()
+    if (nextStep1 > #seq1) then
+        nextStep1 = 1
+        nextStage1 = 1
+    end
+
     local nextNote1 = seq1[nextStep1][1]
     local nextNumStages1 = seq1[nextStep1][2]
     local nextGateMode1 = seq1[nextStep1][3]
-
-    print("one: \t\tmode: " .. mode1 .. "\tstep: " ..nextStep1 .. "\tstage: " .. nextStage1 .. "\tfixedLengthCount: " .. fixedLengthStageCount1 .. "\tnote: " .. nextNote1 .. "\t\toct: " .. oct1 .. "\tstageCount: " .. nextNumStages1 .. "\tgateMode: " .. nextGateMode1)
 
     if nextStage1 == 1 then
         output[1].volts = nextNote1/12 + oct1
@@ -84,11 +87,14 @@ nextStage2 = 1
 pingPongDir2 = 'forward'
 fixedLengthStageCount2 = 1
 function advance2()
+    if (nextStep2 > #seq2) then
+        nextStep2 = 1
+        nextStage2 = 1
+    end
+
     local nextNote2 = seq2[nextStep2][1]
     local nextNumStages2 = seq2[nextStep2][2]
     local nextGateMode2 = seq2[nextStep2][3]
-
-    print("two: \t\tmode: " .. mode2 .. "\tstep: " ..nextStep2 .. "\tstage: " .. nextStage2 .. "\tfixedLengthCount: " .. fixedLengthStageCount2 .. "\tnote: " .. nextNote2 .. "\t\toct: " .. oct2 .. "\tstageCount: " .. nextNumStages2 .. "\tgateMode: " .. nextGateMode2)
 
     if nextStage2 == 1 then
         output[3].volts = nextNote2/12 + oct2
@@ -142,12 +148,14 @@ end
 function advance()
     advance1()
     advance2()
-    print("\n")
+    -- print("\n")
 end
 
 function init()
     input[1]{ mode = "change", direction = "rising" }
     input[1].change = advance
+    -- randomizeAllSteps(1)
+    -- randomizeAllSteps(2)
 end
 
 -- configuration and initialization below, this is what crow will load on boot of the script
@@ -173,7 +181,7 @@ seq1 = {
 -- voice 2
 gateLength2 = .01
 mode2 = "forward"
-oct2 = 2
+oct2 = -1
 fixedLength2 = 10
 scale2 = { 0, 4, 5, 7, 9, 12, 16, 17 }
 seq2 = {
@@ -209,4 +217,8 @@ end
 function randomizeAllSteps(_v)
     local seqLength = _v == 1 and #seq1 or #seq2
     for i = 1, seqLength do randomizeStep(_v, i) end
+end
+function printSequences()
+    print("voice 1:") for k,v in pairs(seq1) do str = "{ " for k2,v2 in pairs(v) do str = str .. v2 .. ", " end str = string.sub(str, 1, -3) .. "}," print(string.sub(str, 1, -1)) end
+    print("voice 2:") for k,v in pairs(seq2) do str = "{ " for k2,v2 in pairs(v) do str = str .. v2 .. ", " end str = string.sub(str, 1, -3) .. " }," print(string.sub(str, 1, -1)) end
 end
